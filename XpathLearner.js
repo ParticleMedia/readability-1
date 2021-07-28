@@ -141,3 +141,5 @@ XpathLearner.prototype = {
 
 
 global.xpath_learner = new XpathLearner({"max_attributes_per_pattern": 3, "id_class_attributes_only": false});
+
+module.exports.xpath_learner = global.xpath_learner;

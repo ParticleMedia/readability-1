@@ -65,3 +65,5 @@ function match(node_xpaths, xpath_pattern, from_xpaths, from_pattern) {
     }
     return false
 }
+
+module.exports.node_to_xpaths_recursive = node_to_xpaths_recursive;

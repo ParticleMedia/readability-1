@@ -9,3 +9,11 @@ node_modules
 *.jar
 *.xpi
 .vscode/launch.json
+python_tools/.idea/inspectionProfiles/profiles_settings.xml
+python_tools/.idea/inspectionProfiles/Project_Default.xml
+python_tools/.idea/misc.xml
+python_tools/.idea/modules.xml
+python_tools/.idea/python_tools.iml
+python_tools/.idea/vcs.xml
+python_tools/out.txt
+python_tools/test.txt
