@@ -5,6 +5,22 @@ const readline = require('readline');
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
 
+
+function str_find(str_0, str_1) {
+    str_0 = str_0.trim();
+    if(str_0.length == 0) {
+        return -1;
+    }
+    str_1 = str_1.trim();
+    if(str_1.length == 0) {
+        return -1;
+    }
+    str_0 = str_0.replace(/’/g, "'").replace(/“/g, "\"").replace(/”/g, "\"").replace(/\s+/g, " ").replace(/  /g, " ");
+    str_1 = str_1.replace(/’/g, "'").replace(/“/g, "\"").replace(/”/g, "\"").replace(/\s+/g, " ").replace(/  /g, " ");
+    
+    return str_0.indexOf(str_1);
+}
+
 /**
  * 
  * @param {*} str_0 string, its substring to match the full str_1
@@ -191,3 +207,4 @@ async function get_text_node_labels(url, texts, text_nodes, matched_nodes, unmat
 }
 
 module.exports.get_text_node_labels = get_text_node_labels;
+module.exports.str_find = str_find;
