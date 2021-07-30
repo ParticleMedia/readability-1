@@ -1,4 +1,5 @@
 var XpathUtil = require("./XpathUtil");
+var CommonUtil = require("./CommonUtil");
 
 /**
  * Public constructor.
@@ -10,6 +11,16 @@ function XpathLearner(options) {
 }
 
 XpathLearner.prototype = {
+
+  _add_pattern: function(pattern_dict, pattern, node) {
+    var assiated_nodes = pattern_dict[pattern];
+    if(assiated_nodes==null) {
+        pattern_dict[pattern] = [];
+        assiated_nodes = pattern_dict[pattern];
+    }
+    assiated_nodes.push(node);
+  },
+
    /**
    * Iterates over a NodeList, calls `filterFn` for each node and removes node
    * if function returned `true`.
@@ -27,35 +38,24 @@ XpathLearner.prototype = {
         var xpaths = node_xpaths[i];
         for(var j=0; j<xpaths.length; j++) {
             var xpath = xpaths[j];
-            var tag = xpath["ndoeName"];
+            var tag = xpath["nodeName"];
             var attribute_strings = []
-            for(var key in xpath.attributes) {
+            for(var k=0; k<xpath.attributes.length; k++) {
                 if(this.id_class_attributes_only) {
                     if(key.toLowerCase() != "id" && key.toLowerCase() != "class") {
                         continue;
                     }
                 }
-                var value = xath.attributes[key]
+                var attribute = xpath.attributes[k]
+                var key = attribute[0];
+                var value = attribute[1];
                 attribute_strings.push(key + "=" + value);
             }
-            if(this.max_attributes_per_pattern>1) {
-                var curent_length = attribute_strings.length
-                for(var k=0; k>curent_length; k++) {
-                    var s = String.prototype.repeat(attribute_strings[k]);
-                    for(var l=1; l<this.max_attributes_per_pattern; l++) {
-                        s += " " + attribute_strings[l];
-                        attribute_strings.push(String.prototype.repeat(s));
-                    }
-                }
-            }
+            CommonUtil.expand_string_array(attribute_strings, this.max_attributes_per_pattern);
+            this._add_pattern(pattern_dict, tag, node);
             for(var k=0; k<attribute_strings.length; k++) {
                 var pattern = tag + " " + attribute_strings[k];
-                var assiated_nodes = pattern[tag];
-                if(nodes==null) {
-                    pattern[tag] = [];
-                    assiated_nodes = pattern[tag];
-                }
-                assiated_nodes.push(node);
+                this._add_pattern(pattern_dict, tag, node);
             }
         }
     }
@@ -127,7 +127,7 @@ XpathLearner.prototype = {
     return {"pattern": best_pattern, "next": [pattern_0, pattern_1]};
   },
 
-  rule_discovery: function(tests, text_nodes, matched_nodes, nonmatched_nodes) {
+  rule_discovery: function(text_nodes, matched_nodes, nonmatched_nodes) {
     node_xpaths = []
     for(var i=0; i<text_nodes.length; i++) {
         var xpaths = XpathUtil.node_to_xpaths_recursive(text_nodes[i]);

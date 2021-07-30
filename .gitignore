@@ -17,3 +17,4 @@ python_tools/.idea/python_tools.iml
 python_tools/.idea/vcs.xml
 python_tools/out.txt
 python_tools/test.txt
+python_tools/out_rules.txt

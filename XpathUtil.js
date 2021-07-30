@@ -3,13 +3,13 @@ function node_to_xpaths_once(node) {
         return null;
     }
     nodeName = node.nodeName;
-    var attributies = {}
-    if(node.attributies != null) {
-        for(var i=0; i<node.attributies.length; i++) {
-            attributies[node.attributies[i].nodeName] = node.attributies[i].nodeValue;
+    var attributes = [];
+    if(node.attributes != null) {
+        for(var i=0; i<node.attributes.length; i++) {
+            attributes.push([node.attributes[i].nodeName, node.attributes[i].nodeValue]);
         }
     }
-    return {"nodeName": nodeName, "attributes": attributies}
+    return {"nodeName": nodeName, "attributes": attributes}
 }
 
 function node_to_xpaths_recursive(node) {
