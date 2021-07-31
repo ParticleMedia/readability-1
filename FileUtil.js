@@ -11,7 +11,7 @@ async function processLineByLine(in_file_name, out_file_name, processor) {
 
     for await (const line of rl) {
         var out_line = await processor(line);
-        await out_stream.write(out_line + "\n\n");
+        await out_stream.write(line + "\n" + out_line + "\n\n");
     }
     in_stream.close();
     out_stream.end();
