@@ -1,5 +1,6 @@
 var XpathUtil = require("./XpathUtil");
 var CommonUtil = require("./CommonUtil");
+var RuleToXpath = require('./RuleToXpath');
 
 /**
  * Public constructor.
@@ -14,7 +15,7 @@ function XpathLearner(options) {
 
 XpathLearner.prototype = {
 
-  _add_pattern: function(pattern_dict, pattern, node) {
+  _add_pattern: function(pattern_dict, pattern, node_level) {
     var assoiated_nodes = pattern_dict[pattern];
     if(assoiated_nodes==null) {
         pattern_dict[pattern] = [];
@@ -22,12 +23,15 @@ XpathLearner.prototype = {
     }
     else {
         for(var i=0; i<assoiated_nodes.length; i++) {
-            if(assoiated_nodes[i] == node) {
+            if(assoiated_nodes[i][0] == node_level[0]) {
+                if(assoiated_nodes[i][1] < node_level[1]) {
+                    assoiated_nodes[i][1] = node_level[1];
+                }
                 return;
             }
         }
     }
-    assoiated_nodes.push(node);
+    assoiated_nodes.push(node_level);
   },
 
    /**
@@ -61,13 +65,13 @@ XpathLearner.prototype = {
                 if(key.toLowerCase() == "href") {
                     continue;
                 }
-                attribute_strings.push(key + "=" + value);
+                attribute_strings.push(key + "=\"" + value + "\"");
             }
             CommonUtil.expand_string_array(attribute_strings, this.max_attributes_per_pattern);
-            this._add_pattern(pattern_dict, tag, node);
+            this._add_pattern(pattern_dict, tag, [node, j]);
             for(var k=0; k<attribute_strings.length; k++) {
-                var pattern = tag + " " + attribute_strings[k];
-                this._add_pattern(pattern_dict, pattern, node);
+                var pattern = tag + "\t" + attribute_strings[k];
+                this._add_pattern(pattern_dict, pattern, [node, j]);
             }
         }
     }
@@ -92,7 +96,7 @@ XpathLearner.prototype = {
         pr_dict[pattern] = [0.0, 0.0]
         nodes = pattern_dict[pattern];
         for(var i=0; i<nodes.length; i++) {
-            node = nodes[i];
+            node = nodes[i][0];
             if(positive_nodes.has(node)) {
                 pr_dict[pattern][0] += 1.0;
             }
@@ -138,7 +142,11 @@ XpathLearner.prototype = {
     var covering_positive = new Set();
     var missing_positive = new Set();
     var causing_negative = new Set();
-    var nodes = new Set(pattern_dict[best_pattern]);
+    var node_levels = pattern_dict[best_pattern];
+    var nodes = new Set();
+    for(var node_level of node_levels) {
+        nodes.add(node_level[0]);
+    }
     var fp_0 = [];
     var fn_0 = [];
     for(var node of positive_nodes) {
@@ -226,6 +234,8 @@ XpathLearner.prototype = {
     }
     var tag_attribute_dict = this._build_tag_attribute_dict(text_nodes, node_xpaths);
     var rules = this._rule_discovery(tag_attribute_dict, matched_nodes, nonmatched_nodes, 0, 0);
+    var xpath = RuleToXpath.pattern_to_xpaths(rules, tag_attribute_dict, matched_nodes);
+    rules["xpath"] = xpath;
     return rules;
   }
 }

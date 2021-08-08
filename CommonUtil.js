@@ -33,7 +33,7 @@ function expand_string_array(l, n) {
         var s = ""
         for(var j=0; j<ids[i].length; j++) {
             if(j>0) {
-                s += " ";
+                s += "\t";
             }
             s += l[ids[i][j]];
         }
